@@ -1,4 +1,4 @@
-vim.opt.clipboard:append{ "unnamedplus", "unnamed" }
+vim.opt.clipboard:append { "unnamedplus", "unnamed" }
 vim.opt.encoding    = "utf-8"
 vim.opt.list        = false
 vim.opt.number      = true
@@ -28,9 +28,11 @@ vim.opt.smartcase   = true
 vim.opt.completeopt = {
   "fuzzy",
   "popup",
-  "menuone",  -- show menu even if only one candidate
+  "menuone", -- show menu even if only one candidate
   "noinsert",
 }
 
-vim.opt.backup   = true
-vim.opt.undofile = true
+vim.opt.backup      = true
+vim.opt.undofile    = true
+vim.opt.backupdir   = vim.fn.stdpath("data") .. "/backup/"
+vim.opt.undodir     = vim.fn.stdpath("data") .. "/undo/"

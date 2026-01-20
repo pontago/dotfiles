@@ -21,17 +21,17 @@ return {
     },
     cmd = { "NvimTreeToggle", "NvimTreeOpen", "NvimTreeFocus" },
     keys = function()
-      return { { "<C-b>", function()
+      return { { "<leader>b", function()
         local api = require("nvim-tree.api")
         if not api.tree.is_visible() then
-          api.tree.open({find_file = true})
+          api.tree.open({ find_file = true })
           return
         end
         -- close if tree is already focused
         if api.tree.is_tree_buf() then
           api.tree.close()
         else
-          api.tree.focus({find_file = true})
+          api.tree.focus({ find_file = true })
         end
       end
       } }
@@ -61,4 +61,5 @@ return {
   { "easymotion/vim-easymotion", event = "VeryLazy" },
   -- show abs line number only under insert mode
   { "myusuf3/numbers.vim",       event = "InsertEnter" },
+  { 'wakatime/vim-wakatime',     lazy = false }
 }
