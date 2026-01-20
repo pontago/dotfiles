@@ -1,0 +1,77 @@
+vim.opt.updatetime = 1500 -- time until `CursorHold` fire
+vim.api.nvim_create_autocmd("CursorHold", {
+  callback = function()
+    -- Do not open automatically if other float window already open
+    for _, winid in pairs(vim.api.nvim_tabpage_list_wins(0)) do
+      if vim.api.nvim_win_get_config(winid).zindex then
+        return
+      end
+    end
+    vim.diagnostic.open_float({ focusable = false, source = "if_many" })
+  end,
+})
+-- based `:h lsp-attach`
+vim.api.nvim_create_autocmd("LspAttach", {
+  group = vim.api.nvim_create_augroup("my.lsp", {}),
+  callback = function(args)
+    local client = assert(vim.lsp.get_client_by_id(args.data.client_id))
+    -- completion
+    if client:supports_method('textDocument/completion') then
+      local triggerChars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ\'"< _.:@#&|+-*/%='
+      local chars = {}; for i = 1, #triggerChars do table.insert(chars, string.sub(triggerChars, i, i)) end
+      client.server_capabilities.completionProvider.triggerCharacters = chars
+      vim.lsp.completion.enable(true, client.id, args.buf, {
+        autotrigger = true,
+      })
+    end
+    if client:supports_method('textDocument/signatureHelp') then
+      vim.api.nvim_create_autocmd('CursorHoldI', {
+        pattern = '*',
+        callback = function()
+          vim.lsp.buf.signature_help({ focus = false, silent = true })
+        end
+      })
+    end
+    -- auto formatting
+    if not client:supports_method('textDocument/willSaveWaitUntil')
+        and client:supports_method('textDocument/formatting') then
+      vim.api.nvim_create_autocmd('BufWritePre', {
+        group = vim.api.nvim_create_augroup('my.lsp', { clear = false }),
+        buffer = args.buf,
+        callback = function()
+          vim.lsp.buf.format({
+            bufnr = args.buf,
+            id = client.id,
+            timeout_ms = 3000
+          })
+        end,
+      })
+    end
+  end,
+})
+vim.diagnostic.config({ virtual_text = true })
+
+return {
+  {
+    "mason-org/mason.nvim",
+    build = ":MasonUpdate",
+    cmd = { "Mason", "MasonUpdate", "MasonLog", "MasonInstall", "MasonUninstall", "MasonUninstallAll" },
+    config = true,
+  },
+  {
+    "mason-org/mason-lspconfig.nvim",
+    dependencies = {
+      { "mason-org/mason.nvim" },
+      { "neovim/nvim-lspconfig" },
+    },
+    event = { "BufReadPre", "BufNewFile" },
+    config = true,
+    keys = {
+      -- { "<C-space>", "<cmd>lua vim.lsp.completion.get()  <CR>", mode = "i" },
+      { "gh",        "<cmd>lua vim.lsp.buf.hover()       <CR>" },
+      { "gd",        "<cmd>lua vim.lsp.buf.definition()  <CR>" },
+      { "gD",        "<cmd>lua vim.lsp.buf.declaration() <CR>" },
+    },
+  },
+  { "neovim/nvim-lspconfig" },
+}
