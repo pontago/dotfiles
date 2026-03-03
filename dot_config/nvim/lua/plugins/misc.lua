@@ -61,5 +61,25 @@ return {
   { "easymotion/vim-easymotion", event = "VeryLazy" },
   -- show abs line number only under insert mode
   { "myusuf3/numbers.vim",       event = "InsertEnter" },
-  { 'wakatime/vim-wakatime',     lazy = false }
+  { 'wakatime/vim-wakatime',     lazy = false },
+  {
+    "MeanderingProgrammer/render-markdown.nvim",
+    dependencies = { "nvim-treesitter/nvim-treesitter", "nvim-tree/nvim-web-devicons" },
+    keys = {
+      { "<leader>md", ":RenderMarkdown toggle<CR>" },
+    },
+    opts = {},
+  },
+  {
+    "sindrets/diffview.nvim",
+    keys = {
+      { "<leader>df", ":DiffviewOpen<CR>" }
+    }
+  },
+  {
+    "tpope/vim-fugitive",
+    keys = {
+      { "<leader>gs", ":Gvsplit<CR>" }
+    }
+  }
 }
